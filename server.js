@@ -1,3 +1,11 @@
+/*
+ * Todo API & Frontend
+ * Copyright (c) 2025 Lucas (codeman2025)
+ * All rights reserved.
+ *
+ * Use of this code is limited to accessing the hosted API and example frontend only.
+ * Cloning, modification, or redistribution of this codebase is prohibited.
+ */
 const express = require('express');
 const cors = require('cors');
 
@@ -56,3 +64,4 @@ app.put('/api/todos/:id', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`To-Do API live on port ${PORT}`));
+
