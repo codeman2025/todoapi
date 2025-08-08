@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Todo API Client</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f9fafb;
+      color: #333;
+      max-width: 480px;
+      margin: 2rem auto;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      font-weight: 600;
+      color: #4a90e2;
+      margin-bottom: 1.5rem;
+    }
+    form {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+    input[type="text"] {
+      flex-grow: 1;
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      border: 1.5px solid #ddd;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+    input[type="text"]:focus {
+      border-color: #4a90e2;
+      outline: none;
+    }
+    button {
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      padding: 0 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      font-size: 1rem;
+    }
+    button:hover {
+      background-color: #357ABD;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+    li {
+      background: white;
+      padding: 0.9rem 1rem;
+      border-radius: 10px;
+      margin-bottom: 0.8rem;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1rem;
+    }
+    li button {
+      background: #e74c3c;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: background-color 0.3s;
+    }
+    li button:hover {
+      background: #c0392b;
+    }
+    /* Scrollbar for the todo list */
+    ul::-webkit-scrollbar {
+      width: 7px;
+    }
+    ul::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    ul::-webkit-scrollbar-thumb {
+      background: #4a90e2;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>My To-Do List</h1>
+
+  <form id="todo-form">
+    <input type="text" id="todo-input" placeholder="Add new task..." autocomplete="off" required />
+    <button type="submit">Add</button>
+  </form>
+
+  <ul id="todo-list"></ul>
+
+  <script>
+    const API_BASE = 'https://todoapi-0n3x.onrender.com/api/todos'; // <— REPLACE with your actual API URL
+
+    async function fetchTodos() {
+      const res = await fetch(API_BASE);
+      const data = await res.json();
+      return data.todos || [];
+    }
+
+    async function addTodo(task) {
+      const res = await fetch(API_BASE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task }),
+      });
+      return await res.json();
+    }
+
+    async function deleteTodo(id) {
+      await fetch(`${API_BASE}/${id}`, { method: 'DELETE' });
+    }
+
+    function renderTodos(todos) {
+      const ul = document.getElementById('todo-list');
+      ul.innerHTML = '';
+      todos.forEach(todo => {
+        const li = document.createElement('li');
+        li.textContent = todo.task;
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'Delete';
+        delBtn.onclick = async () => {
+          await deleteTodo(todo.id);
+          loadTodos();
+        };
+        li.appendChild(delBtn);
+        ul.appendChild(li);
+      });
+    }
+
+    async function loadTodos() {
+      const todos = await fetchTodos();
+      renderTodos(todos);
+    }
+
+    document.getElementById('todo-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const input = document.getElementById('todo-input');
+      if (!input.value.trim()) return;
+      await addTodo(input.value.trim());
+      input.value = '';
+      loadTodos();
+    });
+
+    loadTodos();
+  </script>
+
+</body>
+</html>
